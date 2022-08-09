@@ -2,7 +2,7 @@
 """  """
 import os
 from sqlalchemy import create_engine, MetaData, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 USER = os.environ.HBNB_MYSQL_USER
 PSWD = os.environ.HBNB_MYSQL_PWD
 HOST = os.environ.HBNB_MYSQL_HOST
@@ -25,8 +25,15 @@ class DBStorage():
             m.drop_all(self.__engine)
 
     def all(self, cls=None):
-        with Session(self.__engine) as session:
-            query = select()
-            result = session.execute(query).all()
-            for row in result:
-                print(row[0])
+        if cls is None:
+            query = "SELECT * FROM *"
+        else:
+            query = select(cls)
+        result = self.__sessions.execute(query).all()
+        print(result)
+        for row in result:
+            print(row)
+
+    def reload(self):
+        Session = sessionmaker(self.__engine)
+        self.__sessions = Session()

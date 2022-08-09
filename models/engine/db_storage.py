@@ -1,13 +1,21 @@
 #!/usr/bin/python3
 """ Class that defines a DB storage engine """
 import os
-from sqlalchemy import create_engine, MetaData, select
-from sqlalchemy.orm import sessionmaker
-USER = os.environ.HBNB_MYSQL_USER
-PSWD = os.environ.HBNB_MYSQL_PWD
-HOST = os.environ.HBNB_MYSQL_HOST
-DTBS = os.environ.HBNB_MYSQL_DB
-ENV = os.environ.HBNB_ENV
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+from models.base_model import Base
+from models.base_model import BaseModel
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
+USER = os.environ.get('HBNB_MYSQL_USER')
+PSWD = os.environ.get('HBNB_MYSQL_PWD')
+HOST = os.environ.get('HBNB_MYSQL_HOST')
+DTBS = os.environ.get('HBNB_MYSQL_DB')
+ENV = os.environ.get('HBNB_ENV')
 
 
 class DBStorage():
@@ -15,29 +23,37 @@ class DBStorage():
     __engine = None
     __session = None
 
+    classes = {
+        'BaseModel': BaseModel, 'User': User, 'Place': Place,
+        'State': State, 'City': City, 'Amenity': Amenity,
+        'Review': Review
+    }
+
     def __init__(self):
         """ Creating the engine and the session """
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(
             USER, PSWD, HOST, DTBS), pool_pre_ping=True)
         if ENV == 'test':
-            m = MetaData()
-            m.reflect(self.__engine)
-            m.drop_all(self.__engine)
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """ Query the current DB and return all objects """
+        values = dict()
         if cls is None:
-            query = "SELECT * FROM *"
+            # for cls in self.classes.values():
+            # result = self.__session.query(cls)
+            query = self.__session.query(State)
         else:
-            query = select(cls)
+            query = self.__session.query(DBStorage.classes[cls])
         result = self.__session.execute(query).all()
-        print(result)
-        for row in result:
-            print(row)
+        return {f"{type(k).__name__}.{k.id}": k
+                for k in [row[0] for row in result]}
 
     def reload(self):
         """ Create all tables in th current DB and the current session """
-        Session = sessionmaker(self.__engine)
+        Base.metadata.create_all(self.__engine)
+        session = sessionmaker(self.__engine, expire_on_commit=False)
+        Session = scoped_session(session)
         self.__session = Session()
 
     def new(self, obj):

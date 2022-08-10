@@ -4,7 +4,6 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
-from models.base_model import BaseModel
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -24,7 +23,7 @@ class DBStorage():
     __session = None
 
     classes = {
-        'BaseModel': BaseModel, 'User': User, 'Place': Place,
+        'User': User, 'Place': Place,
         'State': State, 'City': City, 'Amenity': Amenity,
         'Review': Review
     }

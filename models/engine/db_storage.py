@@ -39,14 +39,13 @@ class DBStorage():
         """ Query the current DB and return all objects """
         values = dict()
         if cls is None:
-            # for cls in self.classes.values():
-            # result = self.__session.query(cls)
-            query = self.__session.query(State)
+            for c in DBStorage.classes.values():
+                for obj in self.__session.query(c).all():
+                    values[obj.__class__.__name__ + '.' + obj.id] = obj
         else:
-            query = self.__session.query(DBStorage.classes[cls])
-        result = self.__session.execute(query).all()
-        return {f"{type(k).__name__}.{k.id}": k
-                for k in [row[0] for row in result]}
+            for obj in self.__session.query(DBStorage.classes[cls]).all():
+                values[obj.__class__.__name__ + '.' + obj.id] = obj
+        return values
 
     def reload(self):
         """ Create all tables in th current DB and the current session """

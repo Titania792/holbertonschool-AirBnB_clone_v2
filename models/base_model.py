@@ -36,6 +36,7 @@ class BaseModel:
         if not kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
+            self.updated_at = datetime.now()
         else:
             if STRG != 'db':
                 kwargs.pop('__class__', None)
@@ -43,12 +44,12 @@ class BaseModel:
                 kwargs['id'] = str(uuid.uuid4())
             if 'created_at' not in kwargs:
                 kwargs['created_at'] = datetime.now()
-            if not isinstance('created_at', datetime):
+            elif not isinstance('created_at', datetime):
                 kwargs['created_at'] = datetime.strptime(
                     kwargs['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
             if 'updated_at' not in kwargs:
                 kwargs['updated_at'] = datetime.now()
-            if not isinstance('updated_at', datetime):
+            elif not isinstance('updated_at', datetime):
                 kwargs['updated_at'] = datetime.strptime(
                     kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
             for key, value in kwargs.items():

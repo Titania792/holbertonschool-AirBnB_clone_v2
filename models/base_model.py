@@ -36,24 +36,28 @@ class BaseModel:
         if not kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            self.save()
         else:
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
-            for k, v in kwargs.items():
-                if 'updated_at' == k or 'created_at' == k:
-                    continue
-                if k not in kwargs.keys():
-                    setattr(self, k, v)
+            if STRG != 'db':
+                kwargs.pop('__class__', None)
+            if 'id' not in kwargs:
+                kwargs['id'] = str(uuid.uuid4())
+            if 'created_at' not in kwargs:
+                kwargs['created_at'] = datetime.now()
+            if not isinstance('created_at', datetime):
+                kwargs['created_at'] = datetime.strptime(
+                    kwargs['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
+            if 'updated_at' not in kwargs:
+                kwargs['updated_at'] = datetime.now()
+            if not isinstance('updated_at', datetime):
+                kwargs['updated_at'] = datetime.strptime(
+                    kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
     def __str__(self):
         """Returns a string representation of the instance"""
         cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.to_dict())
+        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""

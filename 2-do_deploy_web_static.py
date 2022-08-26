@@ -8,18 +8,6 @@ env.user = "ubuntu"
 env.hosts = ['54.89.74.48', '54.227.178.59']
 
 
-def do_pack():
-    """ generates a .tgz archive """
-    dt = datetime.now().strftime("%Y%m%d%H%M%S")
-    ftgz = "versions/web_static_" + dt + ".tgz"
-    local("mkdir -p versions")
-    local("tar -cvzf " + ftgz + " web_static")
-    if not os.path.exists(ftgz):
-        return None
-    else:
-        return ftgz
-
-
 def do_deploy(archive_path):
     """distributes an archive to our web servers"""
     if os.path.exists(archive_path) is False:

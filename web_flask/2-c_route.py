@@ -20,6 +20,7 @@ def hbnb():
 @web_app.route('/c/<text>', strict_slashes=False)
 def c_text(text):
     """ display 'C {text}' """
+    text = text.replace('_', ' ')
     return 'C {}'.format(text)
 
 

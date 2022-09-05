@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+""" web application hello """
+from flask import Flask, render_template
+from models import storage
+from models.state import State
+
+web_app = Flask(__name__)
+web_app.url_map.strict_slashes = False
+
+
+@web_app.teardown_appcontext
+def teardown_db_close(self):
+    """ teardown method """
+    storage.close()
+
+
+@web_app.route('/states_list')
+def states_list():
+    """ states list """
+    st_list = storage.all(State)
+    return render_template(
+        '7-states_list.html',
+        st_list=st_list)
+
+
+if __name__ == '__main__':
+    web_app.run(host='0.0.0.0', port=5000)

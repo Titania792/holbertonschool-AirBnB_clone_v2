@@ -25,7 +25,7 @@ def c_text(text):
 
 
 @web_app.route('/python', strict_slashes=False)
-@web_app.route('/python/(<text>)', strict_slashes=False)
+@web_app.route('/python/<text>', strict_slashes=False)
 def py_text(text='is cool'):
     """ display 'Python {text}' """
     text = text.replace('_', ' ')
